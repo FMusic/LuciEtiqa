@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en"
+      th:fragment="layout (title, content)">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title}">Default Title</title>
+    <link rel="stylesheet" href="/static/css/styles.css"/>
+</head>
+<body>
+<!-- render the passed-in content fragment here -->
+<div th:insert="${content}">[content]</div>
+</body>
+</html>

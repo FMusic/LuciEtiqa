@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./application.yaml:/app/application.yaml:ro
+    depends_on:
+      - db
+    environment:
+      - KTOR_ENV=prod
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: appdb

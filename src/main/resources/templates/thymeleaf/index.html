@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(
+          'Welcome',
+          ~{::body}
+      )}">
+<head>
+    <!-- nothing needed here, title is passed in above -->
+</head>
+<body>
+<h1>Hello, <span th:text="${user.name}">User</span>!</h1>
+</body>
+</html>

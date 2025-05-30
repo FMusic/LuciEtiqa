@@ -38,7 +38,8 @@ object Wines : UUIDTable("wines") {
     val owner = reference("owner_id", Users)
     val name = varchar("name", 120)
     val vintage = varchar("vintage", 6)               // e.g. “2021”
-    val category = varchar("category", 40)             // Still, Sparkling…
+    val category = varchar("category", 40)  // Still, Sparkling…
+    val origin = varchar("origin", 120).nullable() // e.g. “PDO Rioja”
     val createdAt = timestamp("created_at").default(Clock.System.now())
 }
 
@@ -63,6 +64,11 @@ object WineVersions : UUIDTable("wine_versions") {
     val allergens = text("allergens")              // emphasised on label
     val additivesJson = text("additives_json")         // optional JSON blob
     val jsonPayload = text("render_json")            // entire label as JSON
+
+    val abv = decimal("abv", 4, 1)                    // 12.5 % vol
+    val sugarGpl = decimal("sugar_gpl", 6, 1)              // g per L
+    val servingTempC = decimal("serving_temp_c", 4, 1).nullable()
+    val tastingNotes = text("tasting_notes").nullable()
 }
 
 class WineEntity(id: EntityID<UUID>) : UUIDEntity(id) {
@@ -72,6 +78,7 @@ class WineEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var name by Wines.name
     var vintage by Wines.vintage
     var category by Wines.category
+    var origin by Wines.origin
     val versions by WineVersionEntity referrersOn WineVersions.wine
 }
 
@@ -96,6 +103,10 @@ class WineVersionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var allergens by WineVersions.allergens
     var additives by WineVersions.additivesJson
     var jsonPayload by WineVersions.jsonPayload
+    var abv by WineVersions.abv
+    var sugarGpl by WineVersions.sugarGpl
+    var servingTempC by WineVersions.servingTempC
+    var tastingNotes by WineVersions.tastingNotes
 }
 
 /* ---------- QR LINKS ----------------------------------------------------- */

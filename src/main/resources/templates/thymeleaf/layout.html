@@ -1,15 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="en"
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
       th:fragment="layout (title, content)">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="${title}">Default Title</title>
+    <title th:text="${title}">LuciEtiqa</title>
+
+    <!-- Tailwind – your dev build will purge unused classes automatically -->
     <link rel="stylesheet" href="/static/css/styles.css"/>
+
+    <!-- Tiny Alpine for the hamburger toggle (optional, ~10 kB) -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
-<body>
-<!-- render the passed-in content fragment here -->
-<div th:insert="${content}">[content]</div>
+<body class="min-h-screen flex flex-col bg-gray-50 text-slate-800">
+
+<header class="bg-white shadow">
+    <nav class="container mx-auto flex items-center justify-between px-4 py-3" x-data="{open:false}">
+        <!-- Brand -->
+        <a href="/" class="text-xl font-bold tracking-wide text-indigo-600">LuciEtiqa</a>
+
+        <!-- Hamburger -->
+        <button class="sm:hidden p-2" @click="open=!open" aria-label="Toggle menu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                             d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <!-- Links -->
+        <div class="flex-col sm:flex sm:flex-row sm:items-center gap-6"
+             :class="{'hidden':!open,'flex':open}" >
+            <a href="/wines"
+               class="block px-3 py-2 rounded hover:bg-indigo-50 sm:px-0">My Wines</a>
+            <a href="/wines/new"
+               class="block px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 sm:px-4">
+                Add Wine
+            </a>
+            <form action="/logout" method="post" class="sm:ml-6">
+                <button type="submit"
+                        class="block px-3 py-2 rounded hover:bg-indigo-50 w-full text-left sm:px-0">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main class="container mx-auto flex-1 px-4 py-8"
+      th:insert="~{wines :: content}">[content]</main>
+
+<footer class="bg-white border-t">
+    <div class="container mx-auto px-4 py-6 text-sm text-gray-500">
+        © <span th:text="${#dates.format(#dates.createNow(),'yyyy')}">2025</span>
+        LuciEtiqa · EU 2021/2117-compliant
+    </div>
+</footer>
+
 </body>
 </html>

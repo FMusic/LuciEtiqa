@@ -1,0 +1,38 @@
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="content">
+
+    <!-- Empty state -->
+    <div th:if="${#lists.isEmpty(wines)}"
+         class="rounded-lg border-2 border-dashed border-gray-300 p-10 text-center">
+        <p class="text-lg text-gray-500">You haven’t added any wines yet.</p>
+        <p class="mt-4">
+            <a href="/wines/new"
+               class="text-indigo-600 hover:underline font-medium">Create your first wine →</a>
+        </p>
+    </div>
+
+    <!-- Grid of wine cards -->
+    <ul th:if="${!#lists.isEmpty(wines)}"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <li th:each="w : ${wines}"
+            class="group relative overflow-hidden rounded-xl bg-white shadow
+                   transition hover:shadow-md">
+            <div class="p-5">
+                <h2 class="text-xl font-medium mb-1"
+                    th:text="${w.name}">Wine name</h2>
+                <p class="text-sm text-gray-500 mb-4"
+                   th:text="'Vintage ' + ${w.vintage}">Vintage 2021</p>
+
+                <a th:href="'/wines/' + ${w.id}"
+                   class="inline-flex items-center gap-1 text-indigo-600 font-medium
+                          hover:underline focus:outline-none">
+                    View label →
+                </a>
+            </div>
+
+            <!-- Subtle hover overlay -->
+            <div class="absolute inset-0 bg-indigo-50 opacity-0
+                        group-hover:opacity-10 transition"></div>
+        </li>
+    </ul>
+</div>

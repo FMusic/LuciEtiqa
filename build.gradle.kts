@@ -6,6 +6,7 @@ val logback_version: String by project
 plugins {
     kotlin("jvm") version "2.1.10"
     id("io.ktor.plugin") version "3.1.3"
+    kotlin("plugin.serialization") version "2.1.10"
     id("com.github.node-gradle.node") version "3.5.1"
 }
 
@@ -37,6 +38,10 @@ dependencies {
     implementation("io.ktor:ktor-server-thymeleaf")
     implementation("io.ktor:ktor-server-status-pages")
     implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-server-auth")
+    implementation("io.ktor:ktor-server-sessions")
+    implementation("org.mindrot:jbcrypt:0.4")           // password hashing
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-test-host")
@@ -45,6 +50,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
     // H2 for dev
     runtimeOnly("com.h2database:h2:2.1.214")
     // Postgres for prod
@@ -68,6 +74,32 @@ tasks.register<NodeTask>("tailwindBuild") {
     )
 }
 
+tasks.register<NodeTask>("tailwindWatch") {
+    group = "development"
+    dependsOn("npmInstall")
+    workingDir.set(projectDir)
+
+    script.set(file("node_modules/@tailwindcss/cli/dist/index.mjs"))
+    args.set(
+        listOf(
+            "-c", "tailwind.config.js",
+            "-i", "src/main/resources/static/css/tailwind.css",
+            "-o", "src/main/resources/static/css/styles.css",
+            "--watch"
+        )
+    )
+}
+
+tasks.register<Exec>("browserSync") {
+    group = "development"
+    commandLine("npm", "run", "livereload")
+}
+
+tasks.withType<JavaExec> {
+    // Enables auto-reloading in dev with: ./gradlew run --continuous
+    jvmArgs = listOf("-Dio.ktor.development=true")
+    standardInput = System.`in` // forward input for console input
+}
 
 tasks.named("processResources") {
     dependsOn("tailwindBuild")

@@ -1,7 +1,81 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuciEtiqa — E‑labels illuminated.</title>
+    <meta name="description" content="LuciEtiqa delivers EU‑compliant digital wine labels with illuminated e‑label experiences." />
+    <!-- Tailwind build: dev ➜ /static/css/styles.css → prod ➜ compiled, minified -->
+    <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
-<body>
-<h1>Hello Ktor!</h1>
+<body class="bg-stone-50 text-stone-800 leading-relaxed antialiased">
+<!-- ***** HERO ***** -->
+<header class="relative isolate overflow-hidden bg-gradient-to-br from-amber-800/90 via-rose-900/90 to-stone-950/90 min-h-screen flex items-center">
+    <nav>
+        <a href="/login" class="bg-white text-amber-800 font-semibold px-4 py-2 rounded hover:bg-amber-100 transition">
+            Login
+        </a>
+    </nav>
+    <img src="/static/img/vineyard.jpg" alt="Sun‑lit vineyard" class="absolute inset-0 h-full w-full object-cover object-center opacity-40" />
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-stone-900/80"></div>
+    <div class="relative z-10 mx-auto max-w-6xl px-6 py-24 text-center">
+        <h1 class="font-extrabold text-white text-5xl md:text-7xl drop-shadow-xl motion-safe:animate-fadeInUp">LuciEtiqa</h1>
+        <p class="mt-4 text-amber-100 text-xl md:text-2xl font-medium motion-safe:animate-fadeInUp motion-safe:animation-delay-200">E‑labels illuminated.</p>
+        <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4 motion-safe:animate-fadeInUp motion-safe:animation-delay-400">
+            <a href="#features" class="px-8 py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 shadow-lg text-white font-semibold transition">Explore Features</a>
+            <a href="#contact" class="px-8 py-3 rounded-2xl border border-white/80 text-white hover:bg-white hover:text-amber-700 shadow-lg transition">Get in Touch</a>
+        </div>
+    </div>
+</header>
+
+<!-- ***** FEATURES ***** -->
+<section id="features" class="py-20">
+    <div class="mx-auto max-w-6xl px-6">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Why LuciEtiqa?</h2>
+        <div class="grid gap-8 md:grid-cols-3">
+            <div class="p-8 bg-white rounded-2xl shadow-lg flex flex-col items-start">
+                <svg class="w-12 h-12 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l6 6 6-6"/></svg>
+                <h3 class="font-semibold text-xl mb-2">EU 2021/2117 Compliant</h3>
+                <p class="text-sm text-stone-600">Automated directives embedding ensures every QR code meets the latest digital‑labelling regulations for effortless cross‑border trade.</p>
+            </div>
+            <div class="p-8 bg-white rounded-2xl shadow-lg flex flex-col items-start">
+                <svg class="w-12 h-12 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+                <h3 class="font-semibold text-xl mb-2">QR‑Powered Storytelling</h3>
+                <p class="text-sm text-stone-600">Open a world of tasting notes, vineyard tales, and sustainability data—all a single scan away.</p>
+            </div>
+            <div class="p-8 bg-white rounded-2xl shadow-lg flex flex-col items-start">
+                <svg class="w-12 h-12 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                <h3 class="font-semibold text-xl mb-2">Plug‑and‑Play Service</h3>
+                <p class="text-sm text-stone-600">Kotlin‑native, Docker‑ready. Just push your label content—LuciEtiqa scales from local dev to cloud prod without fuss.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ***** CONTACT ***** -->
+<section id="contact" class="bg-stone-100 py-20">
+    <div class="mx-auto max-w-xl px-6 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">Let’s illuminate your e‑labels</h2>
+        <form action="/contact" method="post" class="space-y-6">
+            <input type="text" name="name" placeholder="Name" required class="w-full p-4 rounded-lg border border-stone-300 focus:ring-amber-600" />
+            <input type="email" name="email" placeholder="Email" required class="w-full p-4 rounded-lg border border-stone-300 focus:ring-amber-600" />
+            <textarea name="message" rows="4" placeholder="Your message…" required class="w-full p-4 rounded-lg border border-stone-300 focus:ring-amber-600"></textarea>
+            <button type="submit" class="w-full py-4 rounded-2xl bg-amber-600 hover:bg-amber-500 shadow-lg text-white font-semibold transition">Send Message</button>
+        </form>
+    </div>
+</section>
+
+<!-- ***** FOOTER ***** -->
+<footer class="bg-stone-900 text-stone-300 py-6 text-sm text-center">
+    <p>&copy; 2025 LuciEtiqa. E‑labels illuminated.</p>
+</footer>
+
+<!-- ***** Framer Motion custom fade‑in (optional): inlined to avoid extra JS; replace with JS/compile step in prod ***** -->
+<style>
+    @keyframes fadeInUp {from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:none;}}
+    .motion-safe\:animate-fadeInUp{animation:fadeInUp 0.8s cubic-bezier(.4,0,.2,1) both;}
+    .motion-safe\:animation-delay-200{animation-delay:.2s;}
+    .motion-safe\:animation-delay-400{animation-delay:.4s;}
+</style>
 </body>
 </html>

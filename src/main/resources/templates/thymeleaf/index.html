@@ -5,9 +5,10 @@
           ~{::body}
       )}">
 <head>
-    <!-- nothing needed here, title is passed in above -->
 </head>
 <body>
-<h1>Hello, <span th:text="${user.name}">User</span>!</h1>
+<div class="container bg-red-400">
+    <p class="font-bold">Hello, <span th:text="${user.name}">User</span>!</p>
+</div>
 </body>
 </html>

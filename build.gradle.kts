@@ -54,19 +54,20 @@ dependencies {
 
 tasks.register<NodeTask>("tailwindBuild") {
     group = "build"
-    dependsOn("npmInstall")         // ensure node_modules is installed first
-    workingDir.set(projectDir)     // run in project root
+    dependsOn("npmInstall")
+    workingDir.set(projectDir)
 
-    // point at the standalone CLI entrypoint
     script.set(file("node_modules/@tailwindcss/cli/dist/index.mjs"))
-
-    // these become the process args after the script
-    args.set(listOf(
-        "-i", "src/main/resources/static/css/tailwind.css",
-        "-o", "src/main/resources/static/css/styles.css",
-        "--minify"
-    ))
+    args.set(
+        listOf(
+            "-c", "tailwind.config.js",                                // <── NEW
+            "-i", "src/main/resources/static/css/tailwind.css",
+            "-o", "src/main/resources/static/css/styles.css",
+            "--minify"
+        )
+    )
 }
+
 
 tasks.named("processResources") {
     dependsOn("tailwindBuild")

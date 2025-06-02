@@ -1,0 +1,108 @@
+<!-- wine_label.html -->
+<!-- TailwindCSS + Thymeleaf template for public wine label -->
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="content">
+
+    <!-- Header / Hero -->
+    <section class="relative overflow-hidden rounded-xl bg-gradient-to-br from-rose-100 to-indigo-100 p-10 md:p-16 shadow-lg">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2"
+            th:text="${wine.name}">Wine Name</h1>
+        <p class="text-lg md:text-xl text-gray-600 mb-6"
+           th:text="${wine.vintage} + ' • ' + ${wine.category}">2023 • Red</p>
+        <p class="text-sm md:text-base text-gray-500"
+           th:if="${wine.origin != null}"
+           th:text="${wine.origin}">PDO Rioja</p>
+    </section>
+
+    <!-- Nutrition + Quick facts -->
+    <section class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Nutrition declaration (EU 2021/2117) -->
+        <div class="md:col-span-2">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Nutrition declaration
+                <span class="text-sm font-normal text-gray-500">(per 100 ml)</span></h2>
+
+            <div class="overflow-x-auto rounded-lg shadow bg-white">
+                <table class="min-w-full text-left text-sm divide-y divide-gray-200">
+                    <tbody class="divide-y divide-gray-200" th:remove="all-but-first">
+                    <tr>
+                        <th class="py-2 pr-4 font-medium whitespace-nowrap">Energy</th>
+                        <td class="py-2 font-mono" th:text="${v.energyKj} + ' kJ / ' + ${v.energyKcal} + ' kcal'">259 kJ / 62 kcal</td>
+                    </tr>
+                    <tr>
+                        <th class="py-2 pr-4 font-medium whitespace-nowrap">Fat</th>
+                        <td class="py-2 font-mono" th:text="${v.fat} + ' g'">0 g</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-6 py-2 pr-4 font-medium whitespace-nowrap">— of which saturates</th>
+                        <td class="py-2 font-mono" th:text="${v.saturates} + ' g'">0 g</td>
+                    </tr>
+                    <tr>
+                        <th class="py-2 pr-4 font-medium whitespace-nowrap">Carbohydrate</th>
+                        <td class="py-2 font-mono" th:text="${v.carbohydrate} + ' g'">3.2 g</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-6 py-2 pr-4 font-medium whitespace-nowrap">— of which sugars</th>
+                        <td class="py-2 font-mono" th:text="${v.sugars} + ' g'">0.2 g</td>
+                    </tr>
+                    <tr>
+                        <th class="py-2 pr-4 font-medium whitespace-nowrap">Protein</th>
+                        <td class="py-2 font-mono" th:text="${v.protein} + ' g'">0 g</td>
+                    </tr>
+                    <tr>
+                        <th class="py-2 pr-4 font-medium whitespace-nowrap">Salt</th>
+                        <td class="py-2 font-mono" th:text="${v.salt} + ' g'">0 g</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-3 text-xs text-gray-500">Values according to Regulation (EU) 2021/2117.</p>
+        </div>
+
+        <!-- Quick facts sidebar -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between border-b pb-2">
+                <span class="font-medium">Alcohol</span>
+                <span class="font-mono" th:text="${v.abv} + ' % vol'">12.5 % vol</span>
+            </div>
+            <div class="flex items-center justify-between border-b pb-2">
+                <span class="font-medium">Residual sugar</span>
+                <span class="font-mono" th:text="${v.sugarGpl} + ' g/L'">3.4 g/L</span>
+            </div>
+            <div class="flex items-center justify-between" th:if="${v.servingTempC != null}">
+                <span class="font-medium">Serve at</span>
+                <span class="font-mono" th:text="${v.servingTempC} + ' °C'">16 °C</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Composition -->
+    <section class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-3">Ingredients</h2>
+            <p class="text-sm leading-relaxed whitespace-pre-line"
+               th:utext="${v.ingredients}">Water, grapes…</p>
+        </div>
+
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-3">Allergens &amp; Additives</h2>
+            <p class="text-sm leading-relaxed whitespace-pre-line" th:if="${v.allergens != null}"
+               th:utext="${v.allergens}"><strong>Sulphites</strong></p>
+            <p class="text-sm leading-relaxed whitespace-pre-line" th:if="${v.additives != null}"
+               th:utext="${v.additives}">E220 (Sulphur dioxide)</p>
+        </div>
+    </section>
+
+    <!-- Tasting notes -->
+    <section class="mt-10" th:if="${v.tastingNotes != null}">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-3">Tasting notes</h2>
+        <p class="text-sm leading-relaxed whitespace-pre-line"
+           th:utext="${v.tastingNotes}">An intense bouquet…</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-16 text-center text-xs text-gray-400">
+        © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span>
+<!--        <span th:text="${wine.owner.email}">Winery</span> — Digital label powered by VinskeEtikete-->
+    </footer>
+</div>

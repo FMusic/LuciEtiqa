@@ -1,28 +1,39 @@
 package mjuzik.le.view
 
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.host
+import io.ktor.server.request.port
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
+import io.ktor.server.sessions.clear
 import io.ktor.server.thymeleaf.ThymeleafContent
 import mjuzik.le.config.UserSession
+import mjuzik.le.domain.QrLinkEntity
+import mjuzik.le.domain.QrLinks
 import mjuzik.le.domain.UserEntity
 import mjuzik.le.domain.Users
 import mjuzik.le.domain.WineEntity
-import mjuzik.le.domain.WineVersionEntity
+import mjuzik.le.domain.WineLabelEntity
 import mjuzik.le.domain.Wines
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import java.util.UUID
 import org.jetbrains.exposed.sql.SortOrder
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
+import javax.imageio.ImageIO
 
 
 fun Application.configureRouting() {
@@ -59,45 +70,112 @@ fun Application.configureRouting() {
             }
         }
 
+        /** Public digital-label page */
+        get("/wines/{wineId}") {
+            val idParam = call.parameters["wineId"]
+                ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+            val (wine, version) = transaction {
+                val wine = WineEntity[UUID.fromString(idParam)]
+
+                // pick the newest published version, or fall back to latest draft
+                val version = wine.versions
+                    .sortedByDescending { it.createdAt }
+                    .firstOrNull { it.isPublished } ?: wine.versions.maxBy { it.createdAt }
+
+                wine to version
+            }
+
+            call.respond(
+                ThymeleafContent(
+                    "layout",
+                    mapOf(
+                        "title"   to "${wine.name} – Digital label",
+                        "content" to "wine_label :: content",   // ← fragment name
+                        "wine"    to wine,
+                        "v"       to version                    // shorter handle in template
+                    )
+                )
+            )
+        }
+
+
+        post("/logout") {
+            call.sessions.clear<UserSession>()
+            call.respondRedirect("/")
+        }
+
+        get("/l/{code}") {
+            val code = call.parameters["code"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val wineId = transaction {
+                QrLinkEntity.find { QrLinks.code eq code }
+                    .firstOrNull()
+                    ?.wineVersion
+                    ?.wine
+                    ?.id?.value
+            } ?: return@get call.respond(HttpStatusCode.NotFound)
+
+            call.respondRedirect("/wines/$wineId")
+        }
+
+        get("/qr/{code}.png") {
+            val code = call.parameters["code"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val size = 400                                        // px
+            val targetUrl = "${call.request.origin.scheme}://${call.request.host()}:${call.request.port()}/l/$code"
+
+            val matrix = QRCodeWriter().encode(targetUrl, BarcodeFormat.QR_CODE, size, size)
+            val img = BufferedImage(size, size, BufferedImage.TYPE_INT_RGB)
+            for (x in 0 until size) for (y in 0 until size)
+                img.setRGB(x, y, if (matrix[x, y]) 0xFF000000.toInt() else 0xFFFFFFFF.toInt())
+
+            val baos = ByteArrayOutputStream()
+            ImageIO.write(img, "png", baos)
+            call.respondBytes(baos.toByteArray(), ContentType.Image.PNG)
+        }
+
         authenticate("auth-session") {
 
             get("/wines") {
                 val session = call.principal<UserSession>()!!
-                val wines = transaction {
-                    WineEntity
+                val (wines, qrMap) = transaction {
+                    val list = WineEntity
                         .find { Wines.owner eq session.userId }
                         .orderBy(Wines.createdAt to SortOrder.DESC)
-                        .map { it }                            // DAO list
+                        .toList()
+
+                    // Routing.kt  – /wines list route
+                    val qr: Map<UUID,String?> = list.associate { wine ->
+                        val slug = wine.versions.maxByOrNull { it.createdAt }?.let { latest ->
+                            QrLinkEntity.find { QrLinks.wineVersion eq latest.id }
+                                .firstOrNull()
+                                ?.code
+                        }
+                        wine.id.value /* UUID */ to slug        // ← keep UUID, not EntityID
+                    }
+
+                    list to qr
                 }
+
                 call.respond(
                     ThymeleafContent(
                         "layout",
                         mapOf(
-                            "title" to "My Wines",
-                            "content" to "wines :: content",
-                            "wines" to wines
+                            "title"    to "My Wines",
+                            "content"  to "wines :: content",
+                            "wines"    to wines,
+                            "qrCodes"  to qrMap        // ← new
                         )
                     )
                 )
             }
+
             get("/wines/new") {
                 call.respond(
                     ThymeleafContent(
                         "layout",
                         mapOf(
                             "title" to "Add Wine",
-                            "content" to "new-wine :: content"
-                        )
-                    )
-                )
-            }
-            get("/wines/new") {
-                call.respond(
-                    ThymeleafContent(
-                        "layout",
-                        mapOf(
-                            "title" to "Add Wine",
-                            "content" to "wine_form :: content"
+                            "content" to "wine :: content"
                         )
                     )
                 )
@@ -144,10 +222,8 @@ fun Application.configureRouting() {
                 val servingTempC = p["servingTempC"].toBDorNull()
                 val tastingNotes = p["tastingNotes"].trimOrBlank().ifBlank { null }
 
-                /* ---------- persist ------------------------------------------- */
-                transaction {
+                val (qrSlug, wineId) = transaction {
                     val owner = UserEntity[session.userId]
-
                     val wine = WineEntity.new(UUID.randomUUID()) {
                         this.owner = owner
                         this.name = name
@@ -155,31 +231,48 @@ fun Application.configureRouting() {
                         this.category = category
                         this.origin = origin.ifBlank { null }
                     }
+                    val newWineLabel = WineLabelEntity.new(UUID.randomUUID()) {
+                    this.wine = wine
+                    this.versionTag = "v1"
+                    this.energyKj = energyKj
+                    this.energyKcal = energyKcal
+                    this.fat = fat
+                    this.saturates = saturates
+                    this.carbohydrate = carbohydrate
+                    this.sugars = sugars
+                    this.protein = protein
+                    this.salt = salt
 
-                    WineVersionEntity.new(UUID.randomUUID()) {
-                        this.wine = wine
-                        this.versionTag = "v1"
-                        this.energyKj = energyKj
-                        this.energyKcal = energyKcal
-                        this.fat = fat
-                        this.saturates = saturates
-                        this.carbohydrate = carbohydrate
-                        this.sugars = sugars
-                        this.protein = protein
-                        this.salt = salt
-
-                        this.ingredients = ingredients
-                        this.allergens = allergens
-                        this.additives = additives
-                        this.abv = abv
-                        this.sugarGpl = sugarGpl
-                        this.servingTempC = servingTempC
-                        this.tastingNotes = tastingNotes
-                    }
+                    this.ingredients = ingredients
+                    this.allergens = allergens
+                    this.additives = additives
+                    this.abv = abv
+                    this.sugarGpl = sugarGpl
+                    this.servingTempC = servingTempC
+                    this.tastingNotes = tastingNotes
                 }
 
-                call.respondRedirect("/wines")
+                    val slug = UUID.randomUUID().toString().substring(0, 8)
+                    QrLinkEntity.new(UUID.randomUUID()) {
+                        wineVersion = newWineLabel
+                        code = slug
+                    }
+                    slug to wine.id.value        // we’ll need both outside
+                }
+
+                call.respond(
+                    ThymeleafContent(
+                        "layout",
+                        mapOf(
+                            "title"   to "Add Wine",
+                            "content" to "wine :: content",
+                            "qrCode"  to qrSlug,               // ↓ used by wine.html
+                            "wineId"  to wineId                // handy if you want a link
+                        )
+                    )
+                )
             }
         }
     }
 }
+

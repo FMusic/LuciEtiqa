@@ -43,7 +43,7 @@ object Wines : UUIDTable("wines") {
     val createdAt = timestamp("created_at").default(Clock.System.now())
 }
 
-object WineVersions : UUIDTable("wine_versions") {
+object WineLabels : UUIDTable("wine_versions") {
     val wine = reference("wine_id", Wines)
     val versionTag = varchar("version_tag", 32)       // “v1”, “2023-05-fix”
     val isPublished = bool("published").default(false)
@@ -60,10 +60,10 @@ object WineVersions : UUIDTable("wine_versions") {
     val salt = decimal("salt", 5, 2)
 
     /* --- Everything else ------------------------------------------------ */
-    val ingredients = text("ingredients")            // ordered list
-    val allergens = text("allergens")              // emphasised on label
-    val additivesJson = text("additives_json")         // optional JSON blob
-    val jsonPayload = text("render_json")            // entire label as JSON
+    val ingredients = text("ingredients").nullable()            // ordered list
+    val allergens = text("allergens").nullable()              // emphasised on label
+    val additivesJson = text("additives_json").default("{}")         // optional JSON blob
+    val jsonPayload = text("render_json").default("{}")            // entire label as JSON
 
     val abv = decimal("abv", 4, 1)                    // 12.5 % vol
     val sugarGpl = decimal("sugar_gpl", 6, 1)              // g per L
@@ -79,42 +79,50 @@ class WineEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var vintage by Wines.vintage
     var category by Wines.category
     var origin by Wines.origin
-    val versions by WineVersionEntity referrersOn WineVersions.wine
+    val versions by WineLabelEntity referrersOn WineLabels.wine
 }
 
-class WineVersionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<WineVersionEntity>(WineVersions)
+class WineLabelEntity(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<WineLabelEntity>(WineLabels)
 
-    var wine by WineEntity referencedOn WineVersions.wine
-    var versionTag by WineVersions.versionTag
-    var isPublished by WineVersions.isPublished
-    var createdAt by WineVersions.createdAt
+    var wine by WineEntity referencedOn WineLabels.wine
+    var versionTag by WineLabels.versionTag
+    var isPublished by WineLabels.isPublished
+    var createdAt by WineLabels.createdAt
 
     /* nutrition & ingredients fields exposed as properties */
-    var energyKj by WineVersions.energyKj
-    var energyKcal by WineVersions.energyKcal
-    var fat by WineVersions.fat
-    var saturates by WineVersions.saturates
-    var carbohydrate by WineVersions.carbohydrate
-    var sugars by WineVersions.sugars
-    var protein by WineVersions.protein
-    var salt by WineVersions.salt
-    var ingredients by WineVersions.ingredients
-    var allergens by WineVersions.allergens
-    var additives by WineVersions.additivesJson
-    var jsonPayload by WineVersions.jsonPayload
-    var abv by WineVersions.abv
-    var sugarGpl by WineVersions.sugarGpl
-    var servingTempC by WineVersions.servingTempC
-    var tastingNotes by WineVersions.tastingNotes
+    var energyKj by WineLabels.energyKj
+    var energyKcal by WineLabels.energyKcal
+    var fat by WineLabels.fat
+    var saturates by WineLabels.saturates
+    var carbohydrate by WineLabels.carbohydrate
+    var sugars by WineLabels.sugars
+    var protein by WineLabels.protein
+    var salt by WineLabels.salt
+    var ingredients by WineLabels.ingredients
+    var allergens by WineLabels.allergens
+    var additives by WineLabels.additivesJson
+    var jsonPayload by WineLabels.jsonPayload
+    var abv by WineLabels.abv
+    var sugarGpl by WineLabels.sugarGpl
+    var servingTempC by WineLabels.servingTempC
+    var tastingNotes by WineLabels.tastingNotes
 }
 
 /* ---------- QR LINKS ----------------------------------------------------- */
 
 object QrLinks : UUIDTable("qr_links") {
-    val wineVersion = reference("version_id", WineVersions).uniqueIndex()
+    val wineVersion = reference("version_id", WineLabels).uniqueIndex()
     val code = varchar("code", 12).uniqueIndex()   // short slug in URL
     val createdAt = timestamp("created_at").default(Clock.System.now())
+}
+
+class QrLinkEntity(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<QrLinkEntity>(QrLinks)
+
+    var wineVersion by WineLabelEntity referencedOn QrLinks.wineVersion
+    var code by QrLinks.code
+    var createdAt by QrLinks.createdAt
 }
 
 /* ---------- COLLABORATION (Many-to-Many) -------------------------------- */
@@ -152,7 +160,7 @@ object Subscriptions : UUIDTable("subscriptions") {
 object DomainTables {
     /** Keep **one** source-of-truth list so migrations become trivial */
     val all = arrayOf(
-        Users, Wines, WineVersions, QrLinks,
+        Users, Wines, WineLabels, QrLinks,
         WineCollaborators, Licenses, Subscriptions
     )
 }

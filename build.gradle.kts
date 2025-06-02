@@ -55,6 +55,8 @@ dependencies {
     runtimeOnly("com.h2database:h2:2.1.214")
     // Postgres for prod
     runtimeOnly("org.postgresql:postgresql:42.5.4")
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.zxing:javase:3.5.3")
 
 }
 

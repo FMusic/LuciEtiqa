@@ -6,7 +6,9 @@ import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.thymeleaf.Thymeleaf
+import org.thymeleaf.templatemode.TemplateMode
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
+import org.thymeleaf.templateresolver.FileTemplateResolver
 
 fun Application.configureHTTP() {
     install(DefaultHeaders) {
@@ -23,10 +25,24 @@ fun Application.configureHTTP() {
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
     install(Thymeleaf) {
-        setTemplateResolver(ClassLoaderTemplateResolver().apply {
-            prefix = "templates/thymeleaf/"
-            suffix = ".html"
-            characterEncoding = "utf-8"
-        })
+        if (environment.developmentMode) {
+            /* use the real files directly so no copy is required */
+            setTemplateResolver(FileTemplateResolver().apply {
+                prefix = "src/main/resources/templates/"   // <── project path
+                suffix = ".html"
+                templateMode = TemplateMode.HTML
+                characterEncoding = "UTF-8"
+                cacheable = false                         // live-reload
+            })
+        } else {
+            /* class-path resolver with cache for prod */
+            setTemplateResolver(ClassLoaderTemplateResolver().apply {
+                prefix = "templates/"
+                suffix = ".html"
+                templateMode = TemplateMode.HTML
+                characterEncoding = "UTF-8"
+                cacheable = true
+            })
+        }
     }
 }

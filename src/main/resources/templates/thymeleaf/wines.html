@@ -22,17 +22,29 @@
                     th:text="${w.name}">Wine name</h2>
                 <p class="text-sm text-gray-500 mb-4"
                    th:text="'Vintage ' + ${w.vintage}">Vintage 2021</p>
-
-                <a th:href="'/wines/' + ${w.id}"
-                   class="inline-flex items-center gap-1 text-indigo-600 font-medium
+                <div class="flex justify-between">
+                    <a th:href="'/wines/' + ${w.id}"
+                       class="inline-flex items-center gap-1 text-indigo-600 font-medium
                           hover:underline focus:outline-none">
-                    View label →
-                </a>
+                        View label →
+                    </a>
+                    <a th:href="'/wine/' + ${w.id}"
+                       class="inline-flex items-center gap-1 text-indigo-600 font-medium
+                          hover:underline focus:outline-none">
+                        Edit info →
+                    </a>
+                </div>
+                <img th:if="${qrCodes[w.id.value]}"
+                     th:src="'/qr/' + ${qrCodes[w.id.value]} + '.png'"
+                     alt="QR code"
+                     class="absolute top-4 right-4 w-12 h-12 opacity-80 group-hover:opacity-100 transition"/>
+
             </div>
+
 
             <!-- Subtle hover overlay -->
             <div class="absolute inset-0 bg-indigo-50 opacity-0
-                        group-hover:opacity-10 transition"></div>
+                        group-hover:opacity-10 transition hidden"></div>
         </li>
     </ul>
 </div>

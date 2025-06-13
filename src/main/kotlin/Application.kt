@@ -13,10 +13,11 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    configureHTTP()
+    val env = environment.config.propertyOrNull("ktor.deployment.environment")?.getString() ?: "dev"
+    configureHTTP(env)
     configureMonitoring()
     configureSerialization()
     configureAuth()
     configureRouting()
-    configureDatabase()
+    configureDatabase(env)
 }

@@ -1,0 +1,199 @@
+<!-- wine_edit.html – Tailwind + Thymeleaf template for updating an existing wine -->
+
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="content">
+
+    <!-- Wrapper card -->
+    <div class="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-8">
+        <h1 class="text-3xl font-bold text-indigo-700 mb-8">Edit wine</h1>
+
+        <!-- ⚠️ Ktor/Thymeleaf workaround: we still POST but send hidden _method=PUT so the routing can treat it as an update -->
+        <form th:action="'/wines/' + ${wine.id}" method="post" class="space-y-12">
+            <input type="hidden" name="_method" value="put"/>
+            <input type="hidden" name="id" th:value="${wine.id}"/>
+
+            <!-- ───────────────────────   Basic info   ─────────────────────── -->
+            <section>
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-6">Basic info</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="sm:col-span-2">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name<span class="text-red-500">*</span></label>
+                        <input id="name" name="name" type="text" required placeholder="e.g. Cabernet Sauvignon"
+                               th:value="${wine.name}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+
+                    <div>
+                        <label for="vintage" class="block text-sm font-medium text-gray-700 mb-1">Vintage<span class="text-red-500">*</span></label>
+                        <input id="vintage" name="vintage" type="text" maxlength="6" placeholder="2023" required
+                               th:value="${wine.vintage}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="origin" class="block text-sm font-medium text-gray-700 mb-1">Vintage<span class="text-red-500">*</span></label>
+                        <input id="origin" name="vintage" type="text" maxlength="6" placeholder="2023" required
+                               th:value="${wine.origin}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category<span class="text-red-500">*</span></label>
+                        <select id="category" name="category" required
+                                class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled>Choose…</option>
+                            <option th:each="c : ${categories}"
+                                    th:value="${c}"
+                                    th:selected="${c == wine.category}"
+                                    th:text="${c}">Red</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ───────────────────────   Nutrition   ─────────────────────── -->
+            <section>
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-6 flex items-end gap-2">
+                    Nutrition <span class="text-xs font-normal text-gray-400">(per 100 ml)</span>
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label for="energyKj" class="block text-sm font-medium text-gray-700 mb-1">Energy (kJ)<span class="text-red-500">*</span></label>
+                        <input id="energyKj" name="energyKj" type="number" step="0.1" required
+                               th:value="${version.energyKj}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="energyKcal" class="block text-sm font-medium text-gray-700 mb-1">Energy (kcal)<span class="text-red-500">*</span></label>
+                        <input id="energyKcal" name="energyKcal" type="number" step="0.1" required
+                               th:value="${version.energyKcal}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="fat" class="block text-sm font-medium text-gray-700 mb-1">Fat (g)<span class="text-red-500">*</span></label>
+                        <input id="fat" name="fat" type="number" step="0.1" required
+                               th:value="${version.fat}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+
+                    <div>
+                        <label for="saturates" class="block text-sm font-medium text-gray-700 mb-1">Saturates (g)<span class="text-red-500">*</span></label>
+                        <input id="saturates" name="saturates" type="number" step="0.1" required
+                               th:value="${version.saturates}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="carbohydrate" class="block text-sm font-medium text-gray-700 mb-1">Carbohydrate (g)<span class="text-red-500">*</span></label>
+                        <input id="carbohydrate" name="carbohydrate" type="number" step="0.1" required
+                               th:value="${version.carbohydrate}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="sugars" class="block text-sm font-medium text-gray-700 mb-1">Sugars (g)<span class="text-red-500">*</span></label>
+                        <input id="sugars" name="sugars" type="number" step="0.1" required
+                               th:value="${version.sugars}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="protein" class="block text-sm font-medium text-gray-700 mb-1">Protein (g)<span class="text-red-500">*</span></label>
+                        <input id="protein" name="protein" type="number" step="0.1" required
+                               th:value="${version.protein}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="salt" class="block text-sm font-medium text-gray-700 mb-1">Salt (g)<span class="text-red-500">*</span></label>
+                        <input id="salt" name="salt" type="number" step="0.01" required
+                               th:value="${version.salt}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ───────────────────────   Composition   ─────────────────────── -->
+            <section>
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-6">Composition</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="ingredients" class="block text-sm font-medium text-gray-700 mb-1">Ingredients<span class="text-red-500">*</span></label>
+                        <textarea id="ingredients" name="ingredients" rows="3" required
+                                  class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  th:text="${version.ingredients}"></textarea>
+                    </div>
+                    <div>
+                        <label for="allergens" class="block text-sm font-medium text-gray-700 mb-1">Allergens</label>
+                        <textarea id="allergens" name="allergens" rows="2"
+                                  class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  th:text="${version.allergens}"></textarea>
+                    </div>
+                    <div>
+                        <label for="additives" class="block text-sm font-medium text-gray-700 mb-1">Additives (JSON)</label>
+                        <textarea id="additives" name="additives" rows="2"
+                                  placeholder='[{"category":"Preservative","eNumber":"E220"}]'
+                                  class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  th:text="${version.additives}"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ───────────────────────   Additional information   ─────────────────────── -->
+            <section>
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-6">Additional information</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="abv" class="block text-sm font-medium text-gray-700 mb-1">Alcohol (% vol)</label>
+                        <input id="abv" name="abv" type="number" step="0.1"
+                               th:value="${version.abv}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="sugarGpl" class="block text-sm font-medium text-gray-700 mb-1">Residual sugar (g/L)</label>
+                        <input id="sugarGpl" name="sugarGpl" type="number" step="0.1"
+                               th:value="${version.sugarGpl}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div>
+                        <label for="servingTempC" class="block text-sm font-medium text-gray-700 mb-1">Serving temp (°C)</label>
+                        <input id="servingTempC" name="servingTempC" type="number" step="0.1"
+                               th:value="${version.servingTempC}"
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="tastingNotes" class="block text-sm font-medium text-gray-700 mb-1">Tasting notes</label>
+                        <textarea id="tastingNotes" name="tastingNotes" rows="3"
+                                  class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                  th:text="${version.tastingNotes}"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ───────────────────────   Form actions   ─────────────────────── -->
+            <div class="flex flex-wrap items-center gap-4">
+                <button type="submit"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-6 py-2 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Save changes
+                </button>
+                <a href="/wines" class="text-sm text-gray-600 hover:underline">Cancel</a>
+
+                <!-- Optional: Delete wine button on the far right -->
+                <button type="submit" name="_method" value="delete"
+                        class="ml-auto inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-white text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    Delete wine
+                </button>
+            </div>
+        </form>
+
+        <!-- Success message appears only when controller sets flag -->
+        <div th:if="${qrCode != null}" class="mt-12 text-center">
+            <h2 class="text-xl font-semibold text-green-600 mb-4">QR Code Updated</h2>
+
+            <img th:src="'/qr/' + ${qrCode} + '.png'"
+                 alt="QR code" class="mx-auto w-48 h-48 shadow rounded"/>
+
+            <p class="mt-3 text-sm text-gray-500">
+                Scan to verify the latest digital label:<br/>
+                <span class="font-mono text-gray-600">/l/<span th:text="${qrCode}"></span></span>
+            </p>
+        </div>
+    </div>
+</div>

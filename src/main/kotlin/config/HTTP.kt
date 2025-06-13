@@ -10,7 +10,7 @@ import org.thymeleaf.templatemode.TemplateMode
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import org.thymeleaf.templateresolver.FileTemplateResolver
 
-fun Application.configureHTTP() {
+fun Application.configureHTTP(env: String) {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
     }
@@ -25,23 +25,23 @@ fun Application.configureHTTP() {
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
     install(Thymeleaf) {
-        if (environment.developmentMode) {
+        if (env == "dev") {
             /* use the real files directly so no copy is required */
             setTemplateResolver(FileTemplateResolver().apply {
-                prefix = "src/main/resources/templates/"   // <── project path
+                prefix = "src/main/resources/templates/thymeleaf/"   // <── project path
                 suffix = ".html"
                 templateMode = TemplateMode.HTML
                 characterEncoding = "UTF-8"
-                cacheable = false                         // live-reload
+//                cacheable = false                         // live-reload
             })
         } else {
             /* class-path resolver with cache for prod */
             setTemplateResolver(ClassLoaderTemplateResolver().apply {
-                prefix = "templates/"
+                prefix = "templates/thymeleaf/"
                 suffix = ".html"
                 templateMode = TemplateMode.HTML
                 characterEncoding = "UTF-8"
-                cacheable = true
+//                cacheable = true
             })
         }
     }

@@ -9,8 +9,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun Application.configureDatabase() {
-    val env = environment.config.propertyOrNull("ktor.deployment.environment")?.getString() ?: "dev"
+fun Application.configureDatabase(env: String) {
     val dsConfig = environment.config.config("environments.$env.datasource")
     val config = HikariConfig().apply {
         driverClassName = dsConfig.property("driver").getString()

@@ -14,6 +14,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     val env = environment.config.propertyOrNull("ktor.deployment.environment")?.getString() ?: "dev"
+    println("Starting application in environment: $env")
     configureHTTP(env)
     configureMonitoring()
     configureSerialization()

@@ -1,0 +1,24 @@
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="content">
+    <h1 class="text-2xl font-bold mb-6">All Users</h1>
+    <table class="min-w-full bg-white shadow rounded">
+        <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">Email</th>
+            <th class="py-2 px-4 border-b">Role</th>
+            <th class="py-2 px-4 border-b">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${users}">
+            <td class="py-2 px-4 border-b" th:text="${u.email}">email</td>
+            <td class="py-2 px-4 border-b" th:text="${u.role}">role</td>
+            <td class="py-2 px-4 border-b">
+                <a th:href="'/admin/users/' + ${u.id.value}"
+                   class="text-indigo-600 hover:underline">View Wines</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+

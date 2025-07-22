@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
 import mjuzik.le.domain.DomainTables
 import mjuzik.le.domain.seedFakeDataIfDev
+import mjuzik.le.domain.seedProdInitialData
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -25,5 +26,11 @@ fun Application.configureDatabase(env: String) {
     transaction {
         SchemaUtils.createMissingTablesAndColumns(*DomainTables.all)
     }
-    seedFakeDataIfDev(env)
+    if(env=="dev")  {
+        seedFakeDataIfDev(env)
+        seedProdInitialData()
+    }
+    else {
+        seedProdInitialData()
+    }
 }

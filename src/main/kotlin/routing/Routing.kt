@@ -25,6 +25,6 @@ fun Application.configureRouting() {
         publicRoutes()
         wineRoutes()
         wineEditRoutes()
+        adminRoutes()
     }
 }
-

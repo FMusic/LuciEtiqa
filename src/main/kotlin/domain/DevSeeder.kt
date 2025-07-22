@@ -81,3 +81,20 @@ fun seedFakeDataIfDev(env: String) {
     • Wines:    3 minimal + 1 fully populated (QR ⟶ DEMOQR01)""")
 
 }
+
+fun seedProdInitialData(){
+    val adminEmail = "admin@mjuzik.dev"
+    transaction {
+        val adminExists = UserEntity.find { Users.email eq adminEmail }.firstOrNull()
+        if (adminExists == null) {
+            val adminPasswordHash = BCrypt.hashpw("admin", BCrypt.gensalt())
+            val user: UserEntity = UserEntity.new(UUID.randomUUID()) {
+                this.email = adminEmail
+                this.passwordHash = adminPasswordHash
+                this.role = UserRole.ADMIN
+                this.createdAt = Clock.System.now()
+            }
+        }
+    }
+    println("Production database seeded with initial admin user: $adminEmail")
+}

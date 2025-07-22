@@ -35,6 +35,12 @@
                class="block px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 sm:px-4">
                 Add Wine
             </a>
+            <!-- Admin link, visible only for admin users -->
+            <a href="/admin/users"
+               th:if="${isAdmin}"
+               class="block px-3 py-2 rounded bg-rose-100 text-rose-700 hover:bg-rose-200 sm:px-4">
+                Admin
+            </a>
             <form action="/logout" method="post" class="sm:ml-6">
                 <button type="submit"
                         class="block px-3 py-2 rounded hover:bg-indigo-50 w-full text-left sm:px-0">

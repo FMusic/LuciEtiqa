@@ -12,7 +12,6 @@ import mjuzik.le.domain.UserEntity
 import mjuzik.le.domain.Users
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
-import java.util.UUID
 import kotlin.text.trim
 
 fun Route.authRoutes() {
@@ -21,16 +20,19 @@ fun Route.authRoutes() {
         val email = p["email"]?.trim() ?: ""
         val password = p["password"] ?: ""
 
-        val userId: UUID? = transaction {
+        val user = transaction {
             UserEntity.find { Users.email eq email }
                 .singleOrNull()
                 ?.takeIf { BCrypt.checkpw(password, it.passwordHash) }
-                ?.id?.value
         }
 
-        if (userId != null) {
-            call.sessions.set(UserSession(userId))
-            call.respondRedirect("/wines")
+        if (user != null) {
+            call.sessions.set(UserSession(user.id.value))
+            if (user.role == mjuzik.le.domain.UserRole.ADMIN) {
+                call.respondRedirect("/admin/users")
+            } else {
+                call.respondRedirect("/wines")
+            }
         } else {
             call.respondRedirect("/?error=badcredentials")
         }

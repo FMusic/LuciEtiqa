@@ -1,0 +1,27 @@
+# .devcontainer/docker-compose.yml
+services:
+  workspace:                     # ← IntelliJ attaches to this container
+    build:
+      context: ..                # repo root is our build context
+      dockerfile: .devcontainer/Dockerfile
+    user: ubuntu                 # same UID/GID as in the Dockerfile
+    volumes:
+      - ..:/workspace:cached     # mount project source
+    command: sleep infinity      # IDE will run Gradle tasks itself
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+
+  db:                            # ← PostgreSQL side-car
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: lucietiqa
+      POSTGRES_PASSWORD: lucietiqa
+      POSTGRES_DB: lucietiqa
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

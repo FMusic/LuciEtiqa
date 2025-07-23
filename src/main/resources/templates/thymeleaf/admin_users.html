@@ -14,8 +14,10 @@
             <td class="py-2 px-4 border-b" th:text="${u.email}">email</td>
             <td class="py-2 px-4 border-b" th:text="${u.role}">role</td>
             <td class="py-2 px-4 border-b">
-                <a th:href="'/admin/users/' + ${u.id.value}"
+                <!-- admin_users.html -->
+                <a th:href="@{/admin/users/{id}/wines(id=${u.id.value})}"
                    class="text-indigo-600 hover:underline">View Wines</a>
+
             </td>
         </tr>
         </tbody>

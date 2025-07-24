@@ -1,6 +1,11 @@
 <div xmlns:th="http://www.thymeleaf.org"
      th:fragment="content">
-    <h1 class="text-2xl font-bold mb-6">All Users</h1>
+    <div class="flex flex-row justify-between mb-4">
+        <h1 class="text-2xl font-bold">All Users</h1>
+        <div>
+            <a href="/admin/users/new" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Add User</a>
+        </div>
+    </div>
     <table class="min-w-full bg-white shadow rounded">
         <thead>
         <tr>
@@ -15,7 +20,7 @@
             <td class="py-2 px-4 border-b" th:text="${u.role}">role</td>
             <td class="py-2 px-4 border-b">
                 <!-- admin_users.html -->
-                <a th:href="@{/admin/users/{id}/wines(id=${u.id.value})}"
+                <a th:href="@{users/{id}(id=${u.id.value})}"
                    class="text-indigo-600 hover:underline">View Wines</a>
 
             </td>
@@ -23,4 +28,3 @@
         </tbody>
     </table>
 </div>
-

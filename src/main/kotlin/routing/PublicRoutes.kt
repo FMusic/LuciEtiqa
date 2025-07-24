@@ -45,7 +45,7 @@ fun Route.publicRoutes(){
                 "layout",
                 mapOf(
                     "title" to "${wine.name} – Digital label",
-                    "content" to "wine_label :: content",   // ← fragment name
+                    "content" to "wine_label",   // ← fragment name
                     "wine" to wine,
                     "v" to version                    // shorter handle in template
                 )

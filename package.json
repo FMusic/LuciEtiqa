@@ -8,7 +8,12 @@
     "tw:init": "npx @tailwindcss/cli init",
     "build:css": "npx @tailwindcss/cli -i src/main/resources/static/css/tailwind.css -o src/main/resources/static/css/styles.css",
     "livereload": "browser-sync start --proxy 'localhost:8080' --files 'src/main/resources/templates/**/*.html,src/main/resources/static/css/*.css'",
-    "dev": "concurrently \"./gradlew run\" \"./gradlew tailwindWatch\" \"npm run livereload\""
+    "dev": "concurrently \"./gradlew run\" \"./gradlew tailwindWatch\" \"npm run livereload\"",
+    "ktor-win": "gradlew run --continuous",
+    "tailwind-win": "npx tailwindcss -c tailwind.config.js -i src/main/resources/static/css/tailwind.css -o src/main/resources/static/css/styles.css --watch --poll",
+    "livereload-win": "browser-sync start --proxy localhost:8080 --files \"src/main/resources/templates/**/*.html,src/main/resources/static/css/*.css\"",
+    "dev-win": "concurrently -k --names \"KTOR,TAILWIND,RELOAD\" \"npm run ktor-win\" \"npm run tailwind-win\" \"npm run livereload-win\""
+
   },
   "keywords": [],
   "author": "",

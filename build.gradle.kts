@@ -54,7 +54,7 @@ dependencies {
     // H2 for dev
     runtimeOnly("com.h2database:h2:2.1.214")
     // Postgres for prod
-    runtimeOnly("org.postgresql:postgresql:42.5.4")
+    implementation("org.postgresql:postgresql:42.5.4")
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.google.zxing:javase:3.5.3")
 
@@ -76,20 +76,22 @@ tasks.register<NodeTask>("tailwindBuild") {
     )
 }
 
-tasks.register<NodeTask>("tailwindWatch") {
+tasks.register<Exec>("tailwindWatchCli") {
     group = "development"
     dependsOn("npmInstall")
-    workingDir.set(projectDir)
 
-    script.set(file("node_modules/@tailwindcss/cli/dist/index.mjs"))
-    args.set(
-        listOf(
-            "-c", "tailwind.config.js",
-            "-i", "src/main/resources/static/css/tailwind.css",
-            "-o", "src/main/resources/static/css/styles.css",
-            "--watch"
-        )
+    standardInput = System.`in`
+
+    commandLine(
+        "npx", "tailwindcss",
+        "-c", "tailwind.config.js",
+        "-i", "src/main/resources/static/css/tailwind.css",
+        "-o", "src/main/resources/static/css/styles.css",
+        "--watch", "--poll"        // --poll is still helpful on Windows
     )
+
+    // Keeps the process alive (Exec *does* have this property)
+    standardInput = System.`in`
 }
 
 tasks.register<Exec>("browserSync") {

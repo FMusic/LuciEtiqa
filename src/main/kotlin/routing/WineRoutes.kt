@@ -50,7 +50,7 @@ fun Route.wineRoutes(){
                     "layout",
                     mapOf(
                         "title" to "My Wines",
-                        "content" to "wines :: content",
+                        "content" to "wines",
                         "wines" to wines,
                         "qrCodes" to qrMap        // ← new
                     )
@@ -64,7 +64,7 @@ fun Route.wineRoutes(){
                     "layout",
                     mapOf(
                         "title" to "Add Wine",
-                        "content" to "wine :: content"
+                        "content" to "wine"
                     )
                 )
             )
@@ -154,7 +154,7 @@ fun Route.wineRoutes(){
                     "layout",
                     mapOf(
                         "title" to "Add Wine",
-                        "content" to "wine :: content",
+                        "content" to "wine",
                         "qrCode" to qrSlug,               // ↓ used by wine.html
                         "wineId" to wineId                // handy if you want a link
                     )
